@@ -2,16 +2,19 @@ import {
     login as loginModel,
     register as registerModel,
     updateToken as updateTokenModel,
+    nullToken as nullTokenModel,
 } from "../models/auth.js";
 
 import {
     getUserByUsername as getUserByUsernameModel,
     getUserByEmail as getUserByEmailModel,
+    getUserById as getUserByIdModel,
 } from "../models/users.js";
 
 import bcrypt from "bcrypt";
 import "dotenv/config";
 import jwt from "jsonwebtoken";
+import { jwtDecode } from "jwt-decode";
 
 export const login = async (req, res) => {
     try {
@@ -102,6 +105,26 @@ export const register = async (req, res) => {
     } catch (error) {
         res.status(505).json({
             message: "Something wrong",
+            error: error.message,
+        });
+    }
+};
+
+export const logout = async (req, res) => {
+    try {
+        const refreshToken = req.cookies.refreshToken;
+        if (!refreshToken) return res.sendStatus(401);
+        const { id } = jwtDecode(refreshToken);
+
+        const [users] = await getUserByIdModel(id);
+
+        if (users.length <= 0) res.status(403);
+        await nullTokenModel(id);
+        res.clearCookie("refreshToken");
+        res.sendStatus(200);
+    } catch (error) {
+        res.status(500).json({
+            message: "Somethong wrong",
             error: error.message,
         });
     }

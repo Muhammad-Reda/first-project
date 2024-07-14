@@ -7,6 +7,9 @@ import {
     getUserById as getUserByIdModel,
     createNewUser as createNewUserModel,
     deleteUserById as deleteUserByIdModel,
+    updateEmailById as updateEmailByIdModel,
+    updatePasswordById as updatePasswordByIdModel,
+    updateUsernameById as updateUsernameByIdModel,
 } from "../models/users.js";
 
 export const getAllUsers = async (req, res) => {
@@ -65,6 +68,93 @@ export const createNewUser = async (req, res) => {
                 username: data.username,
             },
         });
+    } catch (error) {
+        res.status(505).json({
+            message: "Something wrong",
+            error: error.message,
+        });
+    }
+};
+
+export const updateUsernameById = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const { username } = req.body;
+
+        const [foundUserById] = await getUserByIdModel(id);
+
+        if (foundUserById.length <= 0)
+            return res.status(404).json({ message: "Akun tidak ditemukan" });
+
+        await updateUsernameByIdModel(username, id);
+
+        const data = {
+            id,
+            username,
+            email: foundUserById[0].email,
+        };
+
+        res.status(200).json({ message: "Success", data });
+    } catch (error) {
+        res.status(505).json({
+            message: "Something wrong",
+            error: error.message,
+        });
+    }
+};
+
+export const updateEmailById = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const { email } = req.body;
+
+        const [foundUserById] = await getUserByIdModel(id);
+
+        if (foundUserById.length <= 0)
+            return res.status(404).json({ message: "Akun tidak ditemukan" });
+
+        await updateEmailByIdModel(email, id);
+
+        const data = {
+            id,
+            username: foundUserById[0].username,
+            email,
+        };
+
+        res.status(200).json({ message: "Success", data });
+    } catch (error) {
+        res.status(505).json({
+            message: "Something wrong",
+            error: error.message,
+        });
+    }
+};
+
+export const updatePasswordById = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const saltRounds = 10;
+
+        const { password } = req.body;
+
+        const [foundUserById] = await getUserByIdModel(id);
+
+        if (foundUserById.length <= 0)
+            return res.status(404).json({ message: "Akun tidak ditemukan" });
+
+        const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+        await updatePasswordByIdModel(hashedPassword, id);
+
+        const data = {
+            id,
+            username: foundUserById[0].username,
+            email: foundUserById[0].email,
+        };
+
+        res.status(200).json({ message: "Success", data });
     } catch (error) {
         res.status(505).json({
             message: "Something wrong",

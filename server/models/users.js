@@ -23,6 +23,21 @@ export const getUserById = (id) => {
     return connection.execute(query, [id]);
 };
 
+export const updateUsernameById = (username, id) => {
+    const query = "UPDATE users SET username = ? WHERE id = ?";
+    return connection.execute(query, [username, id]);
+};
+
+export const updateEmailById = (email, id) => {
+    const query = "UPDATE users SET email = ? WHERE id = ?";
+    return connection.execute(query, [email, id]);
+};
+
+export const updatePasswordById = (password, id) => {
+    const query = "UPDATE users SET password = ? WHERE id = ?";
+    return connection.execute(query, [password, id]);
+};
+
 export const createNewUser = (data) => {
     const query =
         "INSERT INTO users (email, username, password, refresh_token) VALUES (?, ?, ?, ?)";

@@ -25,7 +25,7 @@ export const refreshToken = async (req, res) => {
                 const accessToken = jwt.sign(
                     paylod,
                     process.env.JWT_ACCESS_SECRET,
-                    { expiresIn: "15s" }
+                    { expiresIn: "15m" }
                 );
                 res.status(200).json({ accessToken });
             }
